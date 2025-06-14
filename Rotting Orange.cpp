@@ -1,41 +1,40 @@
 class Solution {
  public:
-  int maxDistance(vector<vector<int>>& grid) {
+  int orangesRotting(vector<vector<int>>& grid) {
     constexpr int kDirs[4][2] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
     const int m = grid.size();
     const int n = grid[0].size();
+    int countFresh = 0;
     queue<pair<int, int>> q;
-    int water = 0;
 
     for (int i = 0; i < m; ++i)
       for (int j = 0; j < n; ++j)
-        if (grid[i][j] == 0)
-          ++water;
-        else
+        if (grid[i][j] == 1)
+          ++countFresh;
+        else if (grid[i][j] == 2)
           q.emplace(i, j);
 
-    if (water == 0 || water == m * n)
-      return -1;
+    if (countFresh == 0)
+      return 0;
 
-    int ans = 0;
-
-    for (int d = 0; !q.empty(); ++d)
+    int step = 0;
+    for (; !q.empty(); ++step)
       for (int sz = q.size(); sz > 0; --sz) {
         const auto [i, j] = q.front();
         q.pop();
-        ans = d;
         for (const auto& [dx, dy] : kDirs) {
           const int x = i + dx;
           const int y = j + dy;
           if (x < 0 || x == m || y < 0 || y == n)
             continue;
-          if (grid[x][y] > 0)
+          if (grid[x][y] != 1)
             continue;
-          q.emplace(x, y);
-          grid[x][y] = 2;  
+          grid[x][y] = 2;   
+          q.emplace(x, y);  
+          --countFresh;     
         }
       }
 
-    return ans;
+    return countFresh == 0 ? step - 1 : -1;
   }
 };
